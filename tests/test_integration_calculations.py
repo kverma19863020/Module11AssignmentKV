@@ -1,3 +1,4 @@
+cat > tests/test_integration_calculations.py << 'EOF'
 import pytest
 import os
 from sqlalchemy import create_engine
@@ -7,11 +8,13 @@ from app.models.user import User          # noqa: F401
 from app.models.calculation import Calculation, OperationType
 from app.factory.calculation_factory import CalculationFactory
 
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://user:password@localhost:5432/calcdb"
+)
+
 @pytest.fixture(scope="session")
 def engine():
-    url = os.getenv("DATABASE_URL", "sqlite:///:memory:")
-    connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
-    eng = create_engine(url, connect_args=connect_args)
+    eng = create_engine(DATABASE_URL)
     Base.metadata.create_all(bind=eng)
     yield eng
     Base.metadata.drop_all(bind=eng)
@@ -77,3 +80,4 @@ class TestCalculationIntegration:
     def test_invalid_type_raises_at_factory(self):
         with pytest.raises((ValueError, KeyError)):
             CalculationFactory.get_operation("Modulo")
+EOF
