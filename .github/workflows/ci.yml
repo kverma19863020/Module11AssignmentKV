@@ -1,9 +1,8 @@
-cat > .github/workflows/ci.yml << 'EOF'
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -43,26 +42,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h localhost -p 5432 -U user; do
-            echo "Waiting for PostgreSQL..."
-            sleep 2
-          done
+      - name: Wait for PostgreSQL
+        run: until pg_isready -h localhost -p 5432 -U user; do sleep 2; done
 
       - name: Run unit tests
-        env:
-          DATABASE_URL: postgresql://user:password@localhost:5432/calcdb
         run: pytest tests/test_unit_calculations.py -v
 
       - name: Run integration tests
-        env:
-          DATABASE_URL: postgresql://user:password@localhost:5432/calcdb
         run: pytest tests/test_integration_calculations.py -v
 
       - name: Run all tests with coverage
-        env:
-          DATABASE_URL: postgresql://user:password@localhost:5432/calcdb
         run: pytest --cov=app --cov-report=term-missing -v
 
   build-and-push:
@@ -88,4 +77,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/module11assignmentkv:latest
             ${{ secrets.DOCKER_USERNAME }}/module11assignmentkv:${{ github.sha }}
-EOF
