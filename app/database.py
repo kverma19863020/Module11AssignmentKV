@@ -1,4 +1,3 @@
-cat > app/database.py << 'EOF'
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,4 +18,3 @@ def get_db():
         yield db
     finally:
         db.close()
-EOF
