@@ -1,10 +1,9 @@
-cat > tests/test_integration_calculations.py << 'EOF'
 import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import Base
-from app.models.user import User          # noqa: F401
+from app.models.user import User
 from app.models.calculation import Calculation, OperationType
 from app.factory.calculation_factory import CalculationFactory
 
@@ -80,4 +79,3 @@ class TestCalculationIntegration:
     def test_invalid_type_raises_at_factory(self):
         with pytest.raises((ValueError, KeyError)):
             CalculationFactory.get_operation("Modulo")
-EOF
